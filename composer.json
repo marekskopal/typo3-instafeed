@@ -1,0 +1,33 @@
+{
+    "name": "marekskopal/typo3-instafeed",
+    "type": "typo3-cms-extension",
+    "description": "Basic instagram feed plugin for TYPO3 CMS",
+    "keywords": [
+      "TYPO3",
+      "instagram"
+    ],
+    "homepage": "https://marekskopal.cz",
+    "authors": [
+      {
+        "name": "Marek Skopal",
+        "role": "Developer",
+        "homepage": "https://marekskopal.cz"
+      }
+    ],
+    "license": ["GPL-2.0-or-later"],
+    "require": {
+      "typo3/cms-core": "^9.5",
+      "vinkla/instagram": "^9.3",
+      "php-http/message": "^1.7.2",
+      "php-http/guzzle6-adapter": "^2.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarekSkopal\\MsInstafeed\\": "Classes/"
+        }
+    },
+    "replace": {
+        "ms_instafeed": "self.version",
+        "typo3-ter/ms_instafeed": "self.version"
+    }
+}

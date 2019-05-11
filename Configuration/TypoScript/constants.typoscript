@@ -1,0 +1,20 @@
+plugin.tx_msinstafeed {
+    view {
+        # cat=plugin.tx_msinstafeed/file; type=string; label=Path to template root (FE)
+        templateRootPath = EXT:ms_instafeed/Resources/Private/Templates/
+        # cat=plugin.tx_msinstafeed/file; type=string; label=Path to template partials (FE)
+        partialRootPath = EXT:ms_instafeed/Resources/Private/Partials/
+        # cat=plugin.tx_msinstafeed/file; type=string; label=Path to template layouts (FE)
+        layoutRootPath = EXT:ms_instafeed/Resources/Private/Layouts/
+    }
+    settings {
+        # cat=plugin.tx_msinstafeed/file; type=string; label=Access token to instagram API
+        accessToken =
+
+        # cat=plugin.tx_msinstafeed/file; type=string; label=Path to template root (FE)
+        list {
+            # cat=plugin.tx_msinstafeed/file; type=string; label=Limit for posts
+            limit = 6
+        }
+    }
+}
