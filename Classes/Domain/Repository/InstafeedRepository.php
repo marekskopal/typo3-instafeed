@@ -2,14 +2,17 @@
 
 namespace MarekSkopal\MsInstafeed\Domain\Repository;
 
+use Http\Client\Exception\NetworkException;
 use MarekSkopal\MsInstafeed\Domain\Model\Caption;
 use MarekSkopal\MsInstafeed\Domain\Model\Image;
 use MarekSkopal\MsInstafeed\Domain\Model\Post;
 use MarekSkopal\MsInstafeed\Domain\Model\User;
+use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use Vinkla\Instagram\Instagram;
+use Vinkla\Instagram\InstagramException;
 
 /***************************************************************
  *
@@ -41,6 +44,7 @@ use Vinkla\Instagram\Instagram;
  */
 class InstafeedRepository
 {
+    use LoggerAwareTrait;
 
     /** @var Instagram */
     private $instagram;
@@ -64,9 +68,13 @@ class InstafeedRepository
 
         $posts = [];
 
-        $mediaItems = $this->instagram->media($parameters);
-        foreach ($mediaItems as $mediaItem) {
-            $posts[] = $this->createPostFromMediaItem($mediaItem);
+        try {
+            $mediaItems = $this->instagram->media($parameters);
+            foreach ($mediaItems as $mediaItem) {
+                $posts[] = $this->createPostFromMediaItem($mediaItem);
+            }
+        } catch (NetworkException | InstagramException $exception) {
+            $this->logger->warning('Instagram feed can\'t be loaded. - ' . $exception->getMessage());
         }
 
         return $posts;
