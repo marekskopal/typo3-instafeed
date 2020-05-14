@@ -16,7 +16,7 @@
     ],
     "license": ["GPL-2.0-or-later"],
     "require": {
-      "typo3/cms-core": "^9.5",
+      "typo3/cms-core": "^9.5.17",
       "vinkla/instagram": "^9.3",
       "php-http/message": "^1.7.2",
       "php-http/guzzle6-adapter": "^2.0.1"
