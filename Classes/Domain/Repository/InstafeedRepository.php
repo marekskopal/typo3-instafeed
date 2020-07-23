@@ -2,23 +2,18 @@
 
 namespace MarekSkopal\MsInstafeed\Domain\Repository;
 
-use Http\Client\Exception\NetworkException;
-use MarekSkopal\MsInstafeed\Domain\Model\Caption;
-use MarekSkopal\MsInstafeed\Domain\Model\Image;
 use MarekSkopal\MsInstafeed\Domain\Model\Post;
-use MarekSkopal\MsInstafeed\Domain\Model\User;
 use Psr\Log\LoggerAwareTrait;
+use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use Vinkla\Instagram\Instagram;
-use Vinkla\Instagram\InstagramException;
 
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2019 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -46,12 +41,22 @@ class InstafeedRepository
 {
     use LoggerAwareTrait;
 
-    /** @var Instagram */
-    private $instagram;
+    /** @var \RestClient */
+    private $client;
 
+    /**
+     * InstafeedRepository constructor.
+     * @param string $accessToken
+     */
     public function __construct(string $accessToken)
     {
-        $this->instagram = GeneralUtility::makeInstance(Instagram::class, $accessToken);
+        $this->client = new \RestClient([
+            'base_url' => 'https://graph.instagram.com/',
+            'user_agent' => 'ms_instafeed',
+            'parameters' => [
+                'access_token' => $accessToken
+            ],
+        ]);
     }
 
     /**
@@ -61,19 +66,28 @@ class InstafeedRepository
      */
     public function findPosts(?int $limit = null): array
     {
-        $parameters = [];
+        $parameters = [
+            'fields' => 'id,caption,comments_count,like_count,media_type,media_url,permalink,username,timestamp'
+        ];
+
         if ($limit > 0) {
-            $parameters['count'] = $limit;
+            $parameters['limit'] = $limit;
         }
 
         $posts = [];
 
         try {
-            $mediaItems = $this->instagram->media($parameters);
-            foreach ($mediaItems as $mediaItem) {
-                $posts[] = $this->createPostFromMediaItem($mediaItem);
+            $response = $this->client->get('me/media', $parameters);
+            $mediaItems = $response->decode_response();
+
+            foreach ($mediaItems->data as $mediaItem) {
+                $post = $this->createPostFromMediaItem($mediaItem);
+
+                if ($post !== null) {
+                    $posts[] = $post;
+                }
             }
-        } catch (NetworkException | InstagramException $exception) {
+        } catch (\RestClientException $exception) {
             $this->logger->warning('Instagram feed can\'t be loaded. - ' . $exception->getMessage());
         }
 
@@ -83,68 +97,42 @@ class InstafeedRepository
     /**
      * Creates Post entity from media item object
      * @param \stdClass $mediaItem
-     * @return Post
+     * @return Post|null
      * @throws \Exception
      */
-    private function createPostFromMediaItem(\stdClass $mediaItem): Post
+    private function createPostFromMediaItem(\stdClass $mediaItem): ?Post
     {
+        if (empty($mediaItem->media_url)) {
+            return null;
+        }
+
+        $tempFile = GeneralUtility::tempnam('ms_instafeed_' . $mediaItem->id . '_');
+        GeneralUtility::writeFile($tempFile, file_get_contents($mediaItem->media_url));
+
+        $resourceFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
+        $storage = $resourceFactory->getDefaultStorage();
+
+        if (!$storage->hasFolder('ms_instafeed')) {
+            $folder = $storage->createFolder('ms_instafeed');
+        } else {
+            $folder = $storage->getFolder('ms_instafeed');
+        }
+
+        $imageFile = $storage->addFile(
+            $tempFile,
+            $folder,
+            'ms_instafeed_' . $mediaItem->id . '.jpg',
+            DuplicationBehavior::REPLACE
+        );
+
         /** @var Post $post */
         $post = GeneralUtility::makeInstance(Post::class);
         $post->setId($mediaItem->id);
-
-        /** @var User $user */
-        $user = GeneralUtility::makeInstance(User::class);
-        $user->setId($mediaItem->user->id);
-        $user->setFullname($mediaItem->user->full_name);
-        $user->setProfilePicture($mediaItem->user->profile_picture);
-        $user->setUsername($mediaItem->user->username);
-
-        $post->setUser($user);
-
-        /** @var Image $imageThumbnail */
-        $imageThumbnail = GeneralUtility::makeInstance(Image::class);
-        $imageThumbnail->setUrl($mediaItem->images->thumbnail->url);
-        $imageThumbnail->setWidth($mediaItem->images->thumbnail->width);
-        $imageThumbnail->setHeight($mediaItem->images->thumbnail->height);
-
-        $post->setImageThumbnail($imageThumbnail);
-
-        /** @var Image $imageLowResolution */
-        $imageLowResolution = GeneralUtility::makeInstance(Image::class);
-        $imageLowResolution->setUrl($mediaItem->images->low_resolution->url);
-        $imageLowResolution->setWidth($mediaItem->images->low_resolution->width);
-        $imageLowResolution->setHeight($mediaItem->images->low_resolution->height);
-
-        $post->setImageLowResolution($imageLowResolution);
-
-        /** @var Image $imageStandardResolution */
-        $imageStandardResolution = GeneralUtility::makeInstance(Image::class);
-        $imageStandardResolution->setUrl($mediaItem->images->standard_resolution->url);
-        $imageStandardResolution->setWidth($mediaItem->images->standard_resolution->width);
-        $imageStandardResolution->setHeight($mediaItem->images->standard_resolution->height);
-
-        $post->setImageStandardResolution($imageStandardResolution);
-
-        $cretatedTime = new \DateTime();
-        $cretatedTime->setTimestamp((int)$mediaItem->created_time);
-        $post->setCreatedTime($cretatedTime);
-
-        /** @var Caption $caption */
-        $caption = GeneralUtility::makeInstance(Caption::class);
-        $caption->setId($mediaItem->caption->id);
-        $caption->setText($mediaItem->caption->text);
-        $captionCretatedTime = new \DateTime();
-        $captionCretatedTime->setTimestamp((int)$mediaItem->caption->created_time);
-        $caption->setCreatedTime($captionCretatedTime);
-
-        $post->setCaption($caption);
-
-        $post->setUserHasLiked($mediaItem->user_has_liked);
-        $post->setLikes($mediaItem->likes->count);
-        $post->setTags($mediaItem->tags);
-        $post->setFilter($mediaItem->filter);
-        $post->setType($mediaItem->type);
-        $post->setLink($mediaItem->link);
+        $post->setUsername($mediaItem->username);
+        $post->setImage($imageFile);
+        $post->setLink($mediaItem->permalink);
+        $post->setCreatedTime(new \DateTime($mediaItem->timestamp));
+        $post->setCaption($mediaItem->caption);
 
         return $post;
     }

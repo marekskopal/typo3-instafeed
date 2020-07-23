@@ -12,4 +12,8 @@ call_user_func(function() {
         ]
     );
 
+    if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['msinstafeed_posts'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['msinstafeed_posts'] = [];
+    }
+
 });

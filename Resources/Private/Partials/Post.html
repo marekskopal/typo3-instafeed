@@ -3,7 +3,7 @@
 
 <div class="col-sm-2 instafeed-post">
     <f:link.external uri="{post.link}" target="_blank">
-        <img src="{post.imageStandardResolution.url}" class="img-fluid" />
+        <f:image image="{post.image}" alt="{post.caption -> f:format.crop(maxCharacters: 150)}" additionalAttributes="{loading:'lazy'}" />
     </f:link.external>
 </div>
 

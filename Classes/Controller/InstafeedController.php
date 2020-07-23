@@ -3,6 +3,7 @@
 namespace MarekSkopal\MsInstafeed\Controller;
 
 use MarekSkopal\MsInstafeed\Domain\Repository\InstafeedRepository;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -13,7 +14,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  *
  *  Copyright notice
  *
- *  (c) 2019 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -73,7 +74,16 @@ class InstafeedController extends ActionController
             $limit = $this->settings['list']['limit'];
         }
 
-        $posts = $this->instafeedRepository->findPosts($limit);
+        $cacheIdentifier = 'ms_instafeed_posts' . $limit;
+
+        /** @var FrontendInterface $cache */
+        $cache = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->getCache('msinstafeed_posts');
+
+        if (($posts = $cache->get($cacheIdentifier)) === FALSE) {
+            $posts = $this->instafeedRepository->findPosts($limit);
+
+            $cache->set($cacheIdentifier, $posts, [], 86400);
+        }
 
         $this->view->assign('posts', $posts);
     }

@@ -2,11 +2,13 @@
 
 namespace MarekSkopal\MsInstafeed\Domain\Model;
 
+use TYPO3\CMS\Core\Resource\File;
+
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2019 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -35,41 +37,20 @@ class Post
     /** @var string */
     protected $id;
 
-    /** @var User */
-    protected $user;
+    /** @var string */
+    protected $username;
 
-    /** @var Image */
-    protected $imageThumbnail;
+    /** @var File */
+    protected $image;
 
-    /** @var Image */
-    protected $imageLowResolution;
-
-    /** @var Image */
-    protected $imageStandardResolution;
+    /** @var string */
+    protected $link;
 
     /** @var \DateTime */
     protected $createdTime;
 
-    /** @var Caption */
+    /** @var string */
     protected $caption;
-
-    /** @var bool */
-    protected $userHasLiked;
-
-    /** @var int */
-    protected $likes;
-
-    /** @var array */
-    protected $tags;
-
-    /** @var string */
-    protected $filter;
-
-    /** @var string */
-    protected $type;
-
-    /** @var string */
-    protected $link;
 
     /**
      * @return string
@@ -88,67 +69,51 @@ class Post
     }
 
     /**
-     * @return User
+     * @return string
      */
-    public function getUser(): User
+    public function getUsername(): string
     {
-        return $this->user;
+        return $this->username;
     }
 
     /**
-     * @param User $user
+     * @param string $username
      */
-    public function setUser(User $user): void
+    public function setUsername(string $username): void
     {
-        $this->user = $user;
+        $this->username = $username;
     }
 
     /**
-     * @return Image
+     * @return File
      */
-    public function getImageThumbnail(): Image
+    public function getImage(): File
     {
-        return $this->imageThumbnail;
+        return $this->image;
     }
 
     /**
-     * @param Image $imageThumbnail
+     * @param string $image
      */
-    public function setImageThumbnail(Image $imageThumbnail): void
+    public function setImage(File $image): void
     {
-        $this->imageThumbnail = $imageThumbnail;
+        $this->image = $image;
     }
 
     /**
-     * @return Image
+     * @return string
      */
-    public function getImageLowResolution(): Image
+    public function getLink(): string
     {
-        return $this->imageLowResolution;
+        return $this->link;
     }
 
     /**
-     * @param Image $imageLowResolution
+     * @param string $link
      */
-    public function setImageLowResolution(Image $imageLowResolution): void
+    public function setLink(string $link): void
     {
-        $this->imageLowResolution = $imageLowResolution;
-    }
-
-    /**
-     * @return Image
-     */
-    public function getImageStandardResolution(): Image
-    {
-        return $this->imageStandardResolution;
-    }
-
-    /**
-     * @param Image $imageStandardResolution
-     */
-    public function setImageStandardResolution(Image $imageStandardResolution): void
-    {
-        $this->imageStandardResolution = $imageStandardResolution;
+        $this->link = $link;
     }
 
     /**
@@ -168,115 +133,19 @@ class Post
     }
 
     /**
-     * @return Caption
+     * @return string
      */
-    public function getCaption(): Caption
+    public function getCaption(): string
     {
         return $this->caption;
     }
 
     /**
-     * @param Caption $caption
+     * @param string $caption
      */
-    public function setCaption(Caption $caption): void
+    public function setCaption(string $caption): void
     {
         $this->caption = $caption;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUserHasLiked(): bool
-    {
-        return $this->userHasLiked;
-    }
-
-    /**
-     * @param bool $userHasLiked
-     */
-    public function setUserHasLiked(bool $userHasLiked): void
-    {
-        $this->userHasLiked = $userHasLiked;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLikes(): int
-    {
-        return $this->likes;
-    }
-
-    /**
-     * @param int $likes
-     */
-    public function setLikes(int $likes): void
-    {
-        $this->likes = $likes;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTags(): array
-    {
-        return $this->tags;
-    }
-
-    /**
-     * @param array $tags
-     */
-    public function setTags(array $tags): void
-    {
-        $this->tags = $tags;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilter(): string
-    {
-        return $this->filter;
-    }
-
-    /**
-     * @param string $filter
-     */
-    public function setFilter(string $filter): void
-    {
-        $this->filter = $filter;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType(string $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLink(): string
-    {
-        return $this->link;
-    }
-
-    /**
-     * @param string $link
-     */
-    public function setLink(string $link): void
-    {
-        $this->link = $link;
     }
 
 }
