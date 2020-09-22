@@ -3,6 +3,7 @@
 namespace MarekSkopal\MsInstafeed\Domain\Repository;
 
 use MarekSkopal\MsInstafeed\Domain\Model\Post;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,7 +38,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 /**
  * Instafeed repository
  */
-class InstafeedRepository
+class InstafeedRepository implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -80,11 +81,17 @@ class InstafeedRepository
             $response = $this->client->get('me/media', $parameters);
             $mediaItems = $response->decode_response();
 
-            foreach ($mediaItems->data as $mediaItem) {
-                $post = $this->createPostFromMediaItem($mediaItem);
+            if (isset($mediaItems->error)) {
+                $this->logger->error('Instagram feed can\'t be loaded. - ' . $mediaItems->error->message);
+            }
 
-                if ($post !== null) {
-                    $posts[] = $post;
+            if (isset($mediaItems->data)) {
+                foreach ($mediaItems->data as $mediaItem) {
+                    $post = $this->createPostFromMediaItem($mediaItem);
+
+                    if ($post !== null) {
+                        $posts[] = $post;
+                    }
                 }
             }
         } catch (\RestClientException $exception) {
