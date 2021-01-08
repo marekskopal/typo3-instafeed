@@ -3,12 +3,13 @@
 namespace MarekSkopal\MsInstafeed\Domain\Model;
 
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2021 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -40,8 +41,8 @@ class Post
     /** @var string */
     protected $username;
 
-    /** @var File */
-    protected $image;
+    /** @var int */
+    protected $imageUid;
 
     /** @var string */
     protected $link;
@@ -85,11 +86,28 @@ class Post
     }
 
     /**
+     * @return int
+     */
+    public function getImageUid(): int
+    {
+        return $this->imageUid;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImageUid(int $imageUid): void
+    {
+        $this->imageUid = $imageUid;
+    }
+
+    /**
      * @return File
      */
     public function getImage(): File
     {
-        return $this->image;
+        $resourceFactory = ResourceFactory::getInstance();
+        return $resourceFactory->getFileObject($this->getImageUid());
     }
 
     /**
@@ -147,5 +165,4 @@ class Post
     {
         $this->caption = $caption;
     }
-
 }

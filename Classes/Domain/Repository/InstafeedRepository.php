@@ -6,6 +6,7 @@ use MarekSkopal\MsInstafeed\Domain\Model\Post;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -14,7 +15,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  *
  *  Copyright notice
  *
- *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2021 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -116,7 +117,7 @@ class InstafeedRepository implements LoggerAwareInterface
         $tempFile = GeneralUtility::tempnam('ms_instafeed_' . $mediaItem->id . '_');
         GeneralUtility::writeFile($tempFile, file_get_contents($mediaItem->media_url));
 
-        $resourceFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
+        $resourceFactory = ResourceFactory::getInstance();
         $storage = $resourceFactory->getDefaultStorage();
 
         if (!$storage->hasFolder('ms_instafeed')) {
@@ -136,7 +137,7 @@ class InstafeedRepository implements LoggerAwareInterface
         $post = GeneralUtility::makeInstance(Post::class);
         $post->setId($mediaItem->id);
         $post->setUsername($mediaItem->username);
-        $post->setImage($imageFile);
+        $post->setImageUid($imageFile->getUid());
         $post->setLink($mediaItem->permalink);
         $post->setCreatedTime(new \DateTime($mediaItem->timestamp));
         $post->setCaption($mediaItem->caption);

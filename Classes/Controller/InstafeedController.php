@@ -14,7 +14,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  *
  *  Copyright notice
  *
- *  (c) 2020 Marek Skopal <skopal.marek@gmail.com>
+ *  (c) 2021 Marek Skopal <skopal.marek@gmail.com>
  *
  *  All rights reserved
  *
@@ -51,8 +51,6 @@ class InstafeedController extends ActionController
      */
     public function __construct()
     {
-        parent::__construct();
-
         /** @var ObjectManager $objectManager */
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
 
