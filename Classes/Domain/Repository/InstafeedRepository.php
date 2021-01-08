@@ -8,8 +8,6 @@ use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /***************************************************************
  *
@@ -117,7 +115,7 @@ class InstafeedRepository implements LoggerAwareInterface
         $tempFile = GeneralUtility::tempnam('ms_instafeed_' . $mediaItem->id . '_');
         GeneralUtility::writeFile($tempFile, file_get_contents($mediaItem->media_url));
 
-        $resourceFactory = ResourceFactory::getInstance();
+        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $storage = $resourceFactory->getDefaultStorage();
 
         if (!$storage->hasFolder('ms_instafeed')) {

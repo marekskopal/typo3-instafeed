@@ -4,6 +4,7 @@ namespace MarekSkopal\MsInstafeed\Domain\Model;
 
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /***************************************************************
  *
@@ -106,7 +107,7 @@ class Post
      */
     public function getImage(): File
     {
-        $resourceFactory = ResourceFactory::getInstance();
+        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         return $resourceFactory->getFileObject($this->getImageUid());
     }
 

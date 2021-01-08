@@ -1,6 +1,6 @@
 {
     "name": "marekskopal/typo3-instafeed",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "type": "typo3-cms-extension",
     "description": "Basic instagram feed plugin for TYPO3 CMS",
     "keywords": [
