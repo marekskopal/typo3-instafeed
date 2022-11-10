@@ -3,6 +3,6 @@
 ## Installation
 Install Extension via composer.
 
-`composer require marekskopal/instafeed`
+`composer require marekskopal/typo3-instafeed`
 
 ---
