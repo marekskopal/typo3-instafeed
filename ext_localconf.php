@@ -8,11 +8,11 @@ call_user_func(function() {
         'MarekSkopal.MsInstafeed',
         'Instafeed',
         [
-            'Instafeed' => 'list'
+            \MarekSkopal\MsInstafeed\Controller\InstafeedController::class => 'list'
         ]
     );
 
-    if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['msinstafeed_posts'])) {
+    if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['msinstafeed_posts'] ?? null)) {
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['msinstafeed_posts'] = [];
     }
 
